@@ -29,17 +29,31 @@ export default function MyAssets() {
     const marketplaceContract = new ethers.Contract(marketplaceAddress, NFTMarketplace.abi, signer)
     const data = await marketplaceContract.fetchMyNFTs()
 
+    // const items = await Promise.all(data.map(async i => {
+    //   const tokenURI = await marketplaceContract.tokenURI(i.tokenId)
+    //   const meta = await axios.get(tokenURI)
+    //   let price = ethers.utils.formatUnits(i.price.toString(), 'ether')
+    //   let item = {
+    //     price,
+    //     tokenId: i.tokenId.toNumber(),
+    //     seller: i.seller,
+    //     owner: i.owner,
+    //     image: meta.data.image,
+    //     tokenURI
+    //   }
+    //   return item
+    // }))
     const items = await Promise.all(data.map(async i => {
-      const tokenURI = await marketplaceContract.tokenURI(i.tokenId)
-      const meta = await axios.get(tokenURI)
-      let price = ethers.utils.formatUnits(i.price.toString(), 'ether')
+      const tokenUri = await marketplaceContract.tokenURI(i.tokenId)
+      console.log(tokenUri)
+     
       let item = {
-        price,
         tokenId: i.tokenId.toNumber(),
-        seller: i.seller,
+        issuer: i.issuer,
         owner: i.owner,
-        image: meta.data.image,
-        tokenURI
+        image: tokenUri,
+        // name: meta.data.name,
+        // description: meta.data.description,
       }
       return item
     }))
@@ -50,7 +64,7 @@ export default function MyAssets() {
     console.log('nft:', nft)
     router.push(`/resell-nft?id=${nft.tokenId}&tokenURI=${nft.tokenURI}`)
   }
-  if (loadingState === 'loaded' && !nfts.length) return (<h1 className="py-10 px-20 text-3xl">No NFTs owned</h1>)
+  if (loadingState === 'loaded' && !nfts.length) return (<h1 className="py-10 px-20 text-3xl">No Documents listed</h1>)
   return (
     <div className="flex justify-center">
       <div className="p-4">
@@ -60,8 +74,7 @@ export default function MyAssets() {
               <div key={i} className="border shadow rounded-xl overflow-hidden">
                 <img src={nft.image} className="rounded" />
                 <div className="p-4 bg-black">
-                  <p className="text-2xl font-bold text-white">Price - {nft.price} Eth</p>
-                  <button className="mt-4 w-full bg-pink-500 text-white font-bold py-2 px-12 rounded" onClick={() => listNFT(nft)}>List</button>
+                  <button className="mt-4 w-full bg-indigo-500 text-white font-bold py-2 px-12 rounded" onClick={() => listNFT(nft)}>List</button>
                 </div>
               </div>
             ))
